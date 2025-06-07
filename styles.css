@@ -140,6 +140,28 @@ body {
     font-family: inherit;
 }
 
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: #2c3e50;
+    background: #f8f8f8;
+    transition: border-color 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+}
+
+.form-group select:focus {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
