@@ -7,10 +7,10 @@
 
 const WEDDING_CONFIG = {
     // Couple Information
-    coupleName: "John & Jane",
+    coupleName: "Kaustubh & Isha",
     
     // Wedding Details
-    weddingDate: "June 15, 2025",
+    weddingDate: "Novemeber 23rd, 2025",
     weddingTime: "4:00 PM",
     weddingVenue: "Garden Valley Resort",
     
