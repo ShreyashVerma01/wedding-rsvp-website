@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding RSVP - John & Jane</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Homepage -->
+    <div id="homepage" class="page active">
+        <div class="container">
+            <div class="wedding-info">
+                <h1 class="couple-names">John & Jane</h1>
+                <p class="wedding-date">June 15, 2025</p>
+                <p class="wedding-time">4:00 PM</p>
+                <p class="wedding-venue">Garden Valley Resort</p>
+            </div>
+            <button id="rsvp-btn" class="rsvp-button">RSVP</button>
+        </div>
+    </div>
+
+    <!-- RSVP Form Page -->
+    <div id="rsvp-page" class="page">
+        <div class="container">
+            <div class="form-header">
+                <h2>We'd love to celebrate with you!</h2>
+                <p>Please let us know if you can attend</p>
+            </div>
+            
+            <form id="rsvp-form" class="rsvp-form">
+                <div class="form-group">
+                    <label for="guest-count">Number of Guests *</label>
+                    <select id="guest-count" name="guestCount" required>
+                        <option value="">Select</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <!-- Add more options as needed -->
+                    </select>
+                </div>
+                
+                <form id="rsvp-form">
+                    <div id="guest-details-container"></div>
+                    <div class="form-group">
+                        <label for="additional-notes">Additional Notes</label>
+                        <textarea 
+                            id="additional-notes" 
+                            name="additionalNotes" 
+                            placeholder="Any dietary restrictions, allergies, or special requests?"
+                        ></textarea>
+                    </div>
+    
+                    <div class="form-actions">
+                        <button type="button" id="back-btn" class="btn-secondary">Back</button>
+                        <button type="submit" id="submit-btn" class="btn-primary">
+                            <span class="btn-text">Submit RSVP</span>
+                            <span class="loading-spinner" style="display: none;">Submitting...</span>
+                        </button>
+                    </div>
+                    <button type="submit" id="submit-btn">
+                        <span class="loading-spinner" style="display:none;">⏳</span>
+                    </button>
+                </form>
+            </form>
+
+            <!-- Success Message -->
+            <div id="success-message" class="success-message" style="display: none;">
+                <h3>Thank you for your RSVP!</h3>
+                <p>We can't wait to celebrate with you on our special day.</p>
+                <button id="new-rsvp-btn" class="btn-secondary">Submit Another RSVP</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
