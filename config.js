@@ -18,7 +18,7 @@ const WEDDING_CONFIG = {
     pageTitle: "Wedding RSVP - Kaustubh & Isha",
     
     // Google Integration (to be filled after Google Apps Script setup)
-    googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbxbm4_QdTd5xlVn6JiMnSgq6yWDqTRA1SgKN7xkBG_Z6LkFYTVnSNhwOnFAPbeOZv37/exec",
+    googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbyv7TesoL2awMCy8yfhEPfzr_Frn99bv5cqkSqJ5sOYACdEED2uyKgzUd8fl1pdItgr/exec",
     googleSpreadsheetId: "16v8sL3W90X1mDgaWjJ_AzrJ4Z5hYL6O6Wieyi080OcQ",
     
     // Form Text Customization

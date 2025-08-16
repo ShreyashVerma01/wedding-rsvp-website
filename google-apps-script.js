@@ -1,11 +1,11 @@
 /**
  * Google Apps Script for Wedding RSVP Backend
  * This script receives RSVP form submissions and stores them in Google Sheets
- * 
+ *
  * Setup Instructions:
  * 1. Create a new Google Sheet
- * 2. Rename the first sheet to "RSVP_Responses"
- * 3. Add headers in row 1: Timestamp, Submission ID, Guest Names, Food Preference, Additional Notes
+ * 2. Rename the first sheet to "RSVPs"
+ * 3. Add headers in row 1: Timestamp, Submission ID, Guest Names, Food Preferences, Arrival Date, Arrival Time, Arrival Travel Method, Departure Date, Departure Time, Departure Travel Method, Additional Notes, Number of Guests
  * 4. Open Google Apps Script (script.google.com)
  * 5. Create a new project and paste this code
  * 6. Replace SPREADSHEET_ID with your Google Sheet ID
@@ -15,35 +15,47 @@
 
 // Configuration - Replace with your Google Sheet ID
 const SPREADSHEET_ID = '16v8sL3W90X1mDgaWjJ_AzrJ4Z5hYL6O6Wieyi080OcQ';
-const SHEET_NAME = 'RSVPs';
+const SHEET_NAME      = 'RSVPs';
 
 /**
  * Handle incoming POST requests from the wedding RSVP form
  */
 function doPost(e) {
   try {
-    // Parse the JSON data from the request
-    const data = JSON.parse(e.postData.contents);
-    
+    // Parse the form data from the request
+    const data = parseFormData(e.parameter);
+
     // Validate the incoming data
     const validationResult = validateSubmission(data);
     if (!validationResult.isValid) {
       return createResponse(false, validationResult.error);
     }
-    
+
     // Add the RSVP to the spreadsheet
     const result = addRsvpToSheet(data);
-    
     if (result.success) {
       return createResponse(true, 'RSVP submitted successfully', result.rowNumber);
     } else {
       return createResponse(false, result.error);
     }
-    
+
   } catch (error) {
     console.error('Error processing RSVP submission:', error);
     return createResponse(false, 'Server error: ' + error.message);
   }
+}
+
+/**
+ * Handle preflight OPTIONS requests for CORS
+ */
+function doOptions(e) {
+  return ContentService.createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT)
+    .setHeaders({
+      'Access-Control-Allow-Origin' : '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
 }
 
 /**
@@ -54,31 +66,74 @@ function doGet(e) {
 }
 
 /**
+ * Parse form data from the request parameters
+ */
+function parseFormData(params) {
+  const data = {
+    guestCount           : parseInt(params.guest_count, 10) || 0,
+    guests               : [],
+    arrivalDate          : params.arrival_date || '',
+    arrivalTime          : params.arrival_time || '',
+    arrivalTravelMethod  : params.arrival_travel_method || '',
+    departureDate        : params.departure_date || '',
+    departureTime        : params.departure_time || '',
+    departureTravelMethod: params.departure_travel_method || '',
+    additionalNotes      : params.additional_notes || ''
+  };
+
+  // Parse guest data
+  for (let i = 1; i <= data.guestCount; i++) {
+    const name           = params[`guest_name_${i}`];
+    const foodPreference = params[`food_preference_${i}`];
+
+    if (name && foodPreference) {
+      data.guests.push({
+        name           : name.trim(),
+        foodPreference : foodPreference
+      });
+    }
+  }
+
+  return data;
+}
+
+/**
  * Validate the RSVP submission data
  */
 function validateSubmission(data) {
-  // Check required fields
-  if (!data.guestNames || data.guestNames.trim() === '') {
-    return { isValid: false, error: 'Guest names are required' };
+  if (!data.guestCount || data.guestCount < 1) {
+    return { isValid: false, error: 'At least one guest is required' };
   }
-  
-  if (!data.foodPreference || (data.foodPreference !== 'vegetarian' && data.foodPreference !== 'non-vegetarian')) {
-    return { isValid: false, error: 'Valid food preference is required' };
+  if (data.guests.length !== data.guestCount) {
+    return { isValid: false, error: 'Missing guest information' };
   }
-  
-  // Validate guest names format
-  const nameList = data.guestNames.split('\n').filter(name => name.trim() !== '');
-  if (nameList.length === 0) {
-    return { isValid: false, error: 'At least one guest name is required' };
-  }
-  
-  // Check for reasonable name lengths
-  for (let name of nameList) {
-    if (name.trim().length < 2 || name.trim().length > 100) {
-      return { isValid: false, error: 'Guest names must be between 2 and 100 characters' };
+  // Validate each guest
+  for (let guest of data.guests) {
+    if (!guest.name || guest.name.length < 2) {
+      return { isValid: false, error: 'All guest names must be at least 2 characters long' };
+    }
+    if (guest.name.length > 100) {
+      return { isValid: false, error: 'Guest names must be less than 100 characters' };
+    }
+    if (guest.foodPreference !== 'vegetarian' && guest.foodPreference !== 'non-vegetarian') {
+      return { isValid: false, error: 'Valid food preference is required for all guests' };
     }
   }
-  
+  // Validate all travel and time fields
+  if (
+    !data.arrivalDate || !data.arrivalTime || !data.arrivalTravelMethod ||
+    !data.departureDate || !data.departureTime || !data.departureTravelMethod
+  ) {
+    return { isValid: false, error: 'All travel and timing fields are required' };
+  }
+  const arrivalDT = new Date(data.arrivalDate + "T" + data.arrivalTime);
+  const departureDT = new Date(data.departureDate + "T" + data.departureTime);
+  if (isNaN(arrivalDT.getTime()) || isNaN(departureDT.getTime())) {
+    return { isValid: false, error: 'Invalid arrival/departure date or time format' };
+  }
+  if (departureDT <= arrivalDT) {
+    return { isValid: false, error: 'Departure must be after arrival' };
+  }
   return { isValid: true };
 }
 
@@ -87,95 +142,73 @@ function validateSubmission(data) {
  */
 function addRsvpToSheet(data) {
   try {
-    // Open the spreadsheet
     const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
     let sheet = spreadsheet.getSheetByName(SHEET_NAME);
-    
+
     // Create sheet if it doesn't exist
     if (!sheet) {
       sheet = spreadsheet.insertSheet(SHEET_NAME);
-      // Add headers
-      const headers = ['Timestamp', 'Submission ID', 'Guest Names', 'Food Preference', 'Additional Notes', 'Number of Guests'];
+      const headers = [
+        'Timestamp',
+        'Submission ID',
+        'Guest Names',
+        'Food Preferences',
+        'Arrival Date',
+        'Arrival Time',
+        'Arrival Travel Method',
+        'Departure Date',
+        'Departure Time',
+        'Departure Travel Method',
+        'Additional Notes',
+        'Number of Guests'
+      ];
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-      
-      // Format the header row
-      const headerRange = sheet.getRange(1, 1, 1, headers.length);
-      headerRange.setFontWeight('bold');
-      headerRange.setBackground('#f0f0f0');
+      sheet.getRange(1, 1, 1, headers.length)
+           .setFontWeight('bold')
+           .setBackground('#f0f0f0');
     }
-    
-    // Prepare the row data
-    const timestamp = new Date();
-    const guestNames = data.guestNames.replace(/\n/g, ', '); // Convert newlines to commas for better display
-    const numberOfGuests = data.guestNames.split('\n').filter(name => name.trim() !== '').length;
-    
+
+    // Prepare row data
+    const timestamp    = new Date();
+    const submissionId = generateSubmissionId();
+    const guestNames   = data.guests.map(g => g.name).join(', ');
+    const foodPrefs    = data.guests.map(g => `${g.name}: ${g.foodPreference}`).join(', ');
     const rowData = [
       timestamp,
-      data.submissionId || generateSubmissionId(),
+      submissionId,
       guestNames,
-      data.foodPreference,
+      foodPrefs,
+      data.arrivalDate,
+      data.arrivalTime,
+      data.arrivalTravelMethod,
+      data.departureDate,
+      data.departureTime,
+      data.departureTravelMethod,
       data.additionalNotes || 'None',
-      numberOfGuests
+      data.guestCount
     ];
-    
-    // Add the data to the next available row
-    const lastRow = sheet.getLastRow();
-    const newRow = lastRow + 1;
+
+    const newRow = sheet.getLastRow() + 1;
     sheet.getRange(newRow, 1, 1, rowData.length).setValues([rowData]);
-    
-    // Auto-resize columns for better readability
     sheet.autoResizeColumns(1, rowData.length);
-    
-    // Optional: Send email notification (uncomment if needed)
-    // sendEmailNotification(data, newRow);
-    
-    return { 
-      success: true, 
-      rowNumber: newRow,
-      submissionId: rowData[1]
-    };
-    
+
+    return { success: true, rowNumber: newRow, submissionId: submissionId };
   } catch (error) {
     console.error('Error adding RSVP to sheet:', error);
-    return { 
-      success: false, 
-      error: 'Failed to save RSVP: ' + error.message 
-    };
+    return { success: false, error: 'Failed to save RSVP: ' + error.message };
   }
 }
 
 /**
- * Create a standardized JSON response
+ * Create a standardized JSON response with CORS headers
  */
 function createResponse(success, message, data = null) {
-  const response = {
-    success: success,
-    message: message,
-    timestamp: new Date().toISOString()
-  };
-  
-  if (data) {
-    response.data = data;
-  }
-  
-  return ContentService
-    .createTextOutput(JSON.stringify(response))
+  const response = { success, message, timestamp: new Date().toISOString() };
+  if (data !== null) response.data = data;
+  return ContentService.createTextOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON)
     .setHeaders({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    });
-}
-
-/**
- * Handle preflight CORS requests
- */
-function doOptions(e) {
-  return ContentService
-    .createTextOutput('')
-    .setHeaders({
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin' : '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type'
     });
@@ -193,49 +226,18 @@ function generateSubmissionId() {
  */
 function getRsvpStatistics() {
   try {
-    const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = spreadsheet.getSheetByName(SHEET_NAME);
-    
-    if (!sheet) {
-      return { error: 'RSVP sheet not found' };
-    }
-    
-    const lastRow = sheet.getLastRow();
-    if (lastRow <= 1) {
-      return { 
-        totalRsvps: 0,
-        totalGuests: 0,
-        vegetarian: 0,
-        nonVegetarian: 0
-      };
-    }
-    
-    const data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
-    
-    let totalGuests = 0;
-    let vegetarian = 0;
-    let nonVegetarian = 0;
-    
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
+    if (!sheet) return { error: 'RSVP sheet not found' };
+    const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 12).getValues();
+    let totalGuests = 0, vegetarian = 0, nonVegetarian = 0;
     data.forEach(row => {
-      const numberOfGuests = row[5] || 1; // Column F (Number of Guests)
-      const foodPreference = row[3]; // Column D (Food Preference)
-      
-      totalGuests += numberOfGuests;
-      
-      if (foodPreference === 'vegetarian') {
-        vegetarian += numberOfGuests;
-      } else if (foodPreference === 'non-vegetarian') {
-        nonVegetarian += numberOfGuests;
-      }
+      const count = row[11] || 1;
+      totalGuests += count;
+      const prefs = row[3] || '';
+      vegetarian   += (prefs.match(/vegetarian/g) || []).length;
+      nonVegetarian += (prefs.match(/non-vegetarian/g) || []).length;
     });
-    
-    return {
-      totalRsvps: data.length,
-      totalGuests: totalGuests,
-      vegetarian: vegetarian,
-      nonVegetarian: nonVegetarian
-    };
-    
+    return { totalRsvps: data.length, totalGuests, vegetarian, nonVegetarian };
   } catch (error) {
     console.error('Error getting statistics:', error);
     return { error: error.message };

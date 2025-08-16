@@ -1,79 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding RSVP - Kaustubh & Isha</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wedding RSVP - Kaustubh &amp; Isha</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <!-- Homepage -->
-    <div id="homepage" class="page active">
-        <div class="container">
-            <div class="wedding-info">
-                <h1 class="couple-names">Kaustubh & Isha</h1>
-                <p class="wedding-date">November 23rd, 2025</p>
-                <p class="wedding-time">4:00 PM</p>
-                <p class="wedding-venue">Garden Valley Resort</p>
-            </div>
-            <button id="rsvp-btn" class="rsvp-button">RSVP</button>
-        </div>
+  <!-- Homepage -->
+  <div id="homepage" class="page active">
+    <div class="container">
+      <div class="wedding-info">
+        <div class="couple-names">Kaustubh &amp; Isha</div>
+        <div class="wedding-date">November 23rd, 2025</div>
+        <div class="wedding-time">4:00 PM</div>
+        <div class="wedding-venue">Garden Valley Resort</div>
+      </div>
+      <button id="rsvp-btn" class="rsvp-button">RSVP</button>
     </div>
+  </div>
 
-    <!-- RSVP Form Page -->
-    <div id="rsvp-page" class="page">
-        <div class="container">
-            <div class="form-header">
-                <h2>We'd love to celebrate with you!</h2>
-                <p>Please let us know if you can attend</p>
-            </div>
-            
-            <form id="rsvp-form" class="rsvp-form">
-                <div class="form-group">
-                    <label for="guest-count">Number of Guests *</label>
-                    <select id="guest-count" name="guestCount" required>
-                        <option value="">Select</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <!-- Add more options as needed -->
-                    </select>
-                </div>
-                
-                <form id="rsvp-form">
-                    <div id="guest-details-container"></div>
-                    <div class="form-group">
-                        <label for="additional-notes">Additional Notes</label>
-                        <textarea 
-                            id="additional-notes" 
-                            name="additionalNotes" 
-                            placeholder="Any dietary restrictions, allergies, or special requests?"
-                        ></textarea>
-                    </div>
-    
-                    <div class="form-actions">
-                        <button type="button" id="back-btn" class="btn-secondary">Back</button>
-                        <button type="submit" id="submit-btn" class="btn-primary">
-                            <span class="btn-text">Submit RSVP</span>
-                            <span class="loading-spinner" style="display: none;">Submitting...</span>
-                        </button>
-                    </div>
-                    <button type="submit" id="submit-btn">
-                        <span class="loading-spinner" style="display:none;">⏳</span>
-                    </button>
-                </form>
-            </form>
-
-            <!-- Success Message -->
-            <div id="success-message" class="success-message" style="display: none;">
-                <h3>Thank you for your RSVP!</h3>
-                <p>We can't wait to celebrate with you on our special day.</p>
-                <button id="new-rsvp-btn" class="btn-secondary">Submit Another RSVP</button>
-            </div>
+  <!-- Step 1: Guests & Food -->
+  <div id="rsvp-page" class="page">
+    <div class="container">
+      <div class="form-header">
+        <h2>We'd love to celebrate with you!</h2>
+        <p>Please let us know if you can attend</p>
+      </div>
+      <form id="rsvp-form" class="rsvp-form">
+        <div class="form-group">
+          <label for="guest-count">Number of Guests *</label>
+          <select id="guest-count" name="guestCount" required>
+            <option value="">Select</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
         </div>
+        <div id="guest-details-container"></div>
+        <div class="form-actions">
+          <button type="button" id="back-btn" class="btn-secondary">Back</button>
+          <button type="submit" id="to-dates" class="btn-primary">Continue</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- Step 2: Arrival, Departure & Travel Details -->
+  <div id="dates-page" class="page">
+    <div class="container">
+      <div class="form-header">
+        <h2>Travel & Accommodation</h2>
+        <p>Please enter your travel dates, times, and method</p>
+      </div>
+      <form id="dates-form" class="rsvp-form">
+        <div class="form-group">
+          <label for="arrival-date-step">Arrival Date *</label>
+          <input type="date" id="arrival-date-step" name="arrivalDate" required />
+        </div>
+        <div class="form-group">
+          <label for="arrival-time-step">Arrival Time *</label>
+          <input type="time" id="arrival-time-step" name="arrivalTime" required />
+        </div>
+        <div class="form-group">
+          <label for="travel-method-arrival">Arrival Travel Method *</label>
+          <select id="travel-method-arrival" name="arrivalTravelMethod" required>
+            <option value="">Select</option>
+            <option value="car">Car</option>
+            <option value="train">Train</option>
+            <option value="flight">Flight</option>
+            <option value="bus">Bus</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="departure-date-step">Departure Date *</label>
+          <input type="date" id="departure-date-step" name="departureDate" required />
+        </div>
+        <div class="form-group">
+          <label for="departure-time-step">Departure Time *</label>
+          <input type="time" id="departure-time-step" name="departureTime" required />
+        </div>
+        <div class="form-group">
+          <label for="travel-method-departure">Departure Travel Method *</label>
+          <select id="travel-method-departure" name="departureTravelMethod" required>
+            <option value="">Select</option>
+            <option value="car">Car</option>
+            <option value="train">Train</option>
+            <option value="flight">Flight</option>
+            <option value="bus">Bus</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="additional-notes-step">Additional Notes</label>
+          <textarea id="additional-notes-step" name="additionalNotes" placeholder="Dietary restrictions, allergies…"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="back-to-guests" class="btn-secondary">Back</button>
+          <button type="submit" id="to-submit" class="btn-primary">Continue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Step 3: Success Message -->
+  <div id="success-page" class="page">
+    <div class="success-message">
+      <h3>Thank you for your RSVP!</h3>
+      <p>We can’t wait to celebrate with you on our special day.</p>
+      <button id="new-rsvp-btn" class="btn-primary">Submit Another RSVP</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
