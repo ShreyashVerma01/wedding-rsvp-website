@@ -21,8 +21,8 @@ body {
     color: #333;
     min-height: 100vh;
     min-width: 100vw;
-    position: relative; /* for background layers */
-    background: none;   /* remove old gradient */
+    position: relative;
+    background: none;
     overflow-x: hidden;
 }
 
@@ -34,23 +34,23 @@ body::before {
     width: 100vw; height: 100vh;
     background: url("images/isha_kaus_ghibli.jpeg") no-repeat center center/cover;
     filter: blur(6px);
-    transform: scale(1.1); /* prevents gaps at edges after blur */
+    transform: scale(1.08);
     z-index: -2;
     pointer-events: none;
 }
 
-/* Soft tint overlay for readability */
+/* Soft overlay tint */
 body::after {
     content: "";
     position: fixed;
     top: 0; left: 0;
     width: 100vw; height: 100vh;
-    background: rgba(255, 230, 235, 0.5); /* soft pink/white */
+    background: rgba(255,230,235,0.5); /* soft pinkish white */
     z-index: -1;
     pointer-events: none;
 }
 
-/* Page container is always viewport-sized and centered */
+/* Page container always viewport-sized and centered */
 .page {
     position: fixed;
     top: 0; left: 0;
@@ -62,9 +62,10 @@ body::after {
     justify-content: center;
     opacity: 0;
     transform: translateX(100px);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
     pointer-events: none;
     z-index: 2;
+    overflow-y: auto;
 }
 
 .page.active {
@@ -73,7 +74,7 @@ body::after {
     pointer-events: all;
 }
 
-/* Center the main RSVP content, responsive width */
+/* RSVP content box, responsive width */
 .container {
     max-width: 500px;
     width: 90vw;
@@ -84,9 +85,10 @@ body::after {
     margin: 0;
     position: relative;
     z-index: 10;
+    background: none; /* parent is blurred/overlayed */
 }
 
-/* Homepage styles */
+/* HomePage styles */
 .wedding-info {
     margin-bottom: 3rem;
 }
@@ -109,11 +111,11 @@ body::after {
 .wedding-time,
 .wedding-venue {
     font-size: 1.1rem;
-    color: #333;
+    color: #7f8c8d;
     margin-bottom: 0.25rem;
 }
 
-/* Pill-shaped RSVP button */
+/* RSVP Button Big & Touchable */
 .rsvp-button {
     background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -127,6 +129,8 @@ body::after {
     text-transform: uppercase;
     letter-spacing: 1px;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    margin: 1.5rem auto 0 auto;
+    display: block;
 }
 
 .rsvp-button:hover {
@@ -138,7 +142,7 @@ body::after {
     transform: translateY(0);
 }
 
-/* RSVP Form Page */
+/* RSVP Form */
 .form-header {
     margin-bottom: 2.5rem;
 }
@@ -151,17 +155,18 @@ body::after {
 }
 
 .form-header p {
-    color: #333;
+    color: #7f8c8d;
     font-size: 1.1rem;
 }
 
+/* "Glass" card effect for the form background */
 .rsvp-form {
     text-align: left;
-    background: rgba(255,255,255,0.92);  /* glass feel, blends with blurred bg */
+    background: rgba(255,255,255,0.92);
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.13);
-    backdrop-filter: blur(1.5px); /* subtle glass effect */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.13);
+    backdrop-filter: blur(1.5px);
 }
 
 .form-group {
@@ -200,7 +205,7 @@ body::after {
     -webkit-appearance: none;
     -moz-appearance: none;
     outline: none;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+    box-shadow: 0 2px 8px rgba(44,62,80,0.04);
 }
 
 .form-group select:focus {
@@ -310,13 +315,13 @@ body::after {
     display: inline-block;
 }
 
-/* Success message */
+/* Success message card */
 .success-message {
     text-align: center;
     background: rgba(255,255,255,0.95);
     padding: 3rem 2rem;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     backdrop-filter: blur(2px);
 }
 
@@ -333,50 +338,72 @@ body::after {
     margin-bottom: 2rem;
 }
 
-/* Responsive design */
+/* Responsive design for phones */
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem 0.5rem;
+    }
+    .wedding-info {
+        margin-bottom: 2rem;
+    }
+    .couple-names {
+        font-size: 2rem;
+    }
+    .wedding-date {
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+    }
+    .wedding-time,
+    .wedding-venue {
+        font-size: 1rem;
+        margin-bottom: 0.15rem;
+    }
+    .rsvp-button {
+        padding: 1rem 0;
+        font-size: 1.2rem;
+        width: 90vw;
+        max-width: 350px;
+        margin: 1rem auto;
+        display: block;
+    }
+    .form-header h2 {
+        font-size: 1.3rem;
+    }
+    .rsvp-form {
+        padding: 1rem;
+    }
+    .form-header {
+        margin-bottom: 1.5rem;
+    }
+    .success-message {
+        padding: 2rem 1rem;
+    }
+}
+
+/* Tablet responsiveness */
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
     }
-    
     .couple-names {
         font-size: 2.5rem;
     }
-    
     .wedding-date {
         font-size: 1.3rem;
     }
-    
     .rsvp-button {
         padding: 0.875rem 2.5rem;
         font-size: 1.1rem;
     }
-    
     .rsvp-form {
         padding: 1.5rem;
     }
-    
     .form-actions {
         flex-direction: column;
     }
-    
     .radio-group {
         flex-direction: column;
         gap: 1rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .couple-names {
-        font-size: 2rem;
-    }
-    
-    .form-header h2 {
-        font-size: 1.6rem;
-    }
-    
-    .rsvp-form {
-        padding: 1rem;
     }
 }
 
@@ -403,7 +430,7 @@ body::after {
         border-color 0.2s,
         box-shadow 0.2s;
     outline: none;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+    box-shadow: 0 2px 8px rgba(44,62,80,0.04);
 }
 
 .food-btn.selected-veg {
