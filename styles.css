@@ -45,12 +45,12 @@ body::after {
     position: fixed;
     top: 0; left: 0;
     width: 100vw; height: 100vh;
-    background: rgba(255,230,235,0.5); /* soft pinkish white */
+    background: rgba(255,230,235,0.5);
     z-index: -1;
     pointer-events: none;
 }
 
-/* Page container always viewport-sized and centered */
+/* Center each full-page view */
 .page {
     position: fixed;
     top: 0; left: 0;
@@ -77,18 +77,16 @@ body::after {
 /* RSVP content box, responsive width */
 .container {
     max-width: 500px;
-    width: 90vw;
-    min-width: 0;
+    width: 100%;
     box-sizing: border-box;
     padding: 2rem;
     text-align: center;
-    margin: 0;
+    margin: 0 auto;
     position: relative;
     z-index: 10;
-    background: none; /* parent is blurred/overlayed */
+    background: none;
 }
 
-/* HomePage styles */
 .wedding-info {
     margin-bottom: 3rem;
 }
@@ -142,7 +140,20 @@ body::after {
     transform: translateY(0);
 }
 
-/* RSVP Form */
+/* RSVP Form card, always centered and never overflowing */
+.rsvp-form {
+    text-align: left;
+    background: rgba(255,255,255,0.92);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.13);
+    backdrop-filter: blur(1.5px);
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
 .form-header {
     margin-bottom: 2.5rem;
 }
@@ -157,16 +168,6 @@ body::after {
 .form-header p {
     color: #7f8c8d;
     font-size: 1.1rem;
-}
-
-/* "Glass" card effect for the form background */
-.rsvp-form {
-    text-align: left;
-    background: rgba(255,255,255,0.92);
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.13);
-    backdrop-filter: blur(1.5px);
 }
 
 .form-group {
@@ -189,6 +190,7 @@ body::after {
     font-size: 1rem;
     transition: border-color 0.3s ease;
     font-family: inherit;
+    box-sizing: border-box;
 }
 
 .form-group select {
@@ -206,6 +208,7 @@ body::after {
     -moz-appearance: none;
     outline: none;
     box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+    box-sizing: border-box;
 }
 
 .form-group select:focus {
@@ -371,6 +374,7 @@ body::after {
     }
     .rsvp-form {
         padding: 1rem;
+        max-width: 96vw;
     }
     .form-header {
         margin-bottom: 1.5rem;
@@ -380,7 +384,6 @@ body::after {
     }
 }
 
-/* Tablet responsiveness */
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
